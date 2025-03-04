@@ -1,7 +1,7 @@
 from http.server import HTTPServer
 from request_handler import RequestHandler, status
 import json
-from views import User
+from views import User, Post
 
 banner = r"""
                                                        _
@@ -25,7 +25,10 @@ class RareApi(RequestHandler):
         request_body = self.rfile.read(content_len)
         request = json.loads(request_body.decode("UTF-8"))
 
-        if url["requested_resource"] == "register":
+        if url["requested_resource"] == "posts":
+            Post().create_post(request)
+            return self.response("", status.HTTP_201_SUCCESS_CREATED)
+        elif url["requested_resource"] == "register":
             response = User().create_user(request)
             return self.response(response, status.HTTP_201_SUCCESS_CREATED)
 
