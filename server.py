@@ -29,6 +29,13 @@ class RareApi(RequestHandler):
             response = User().create_user(request)
             return self.response(response, status.HTTP_201_SUCCESS_CREATED)
 
+        if url["requested_resource"] == "login":
+            response = User().login_user(request)
+            if json.loads(response)["valid"] == True:
+                return self.response(response, status.HTTP_200_SUCCESS)
+            else:
+                return self.response(response, status.HTTP_406_CLIENT_ERROR_NOT_ACCEPTABLE)
+
     def do_PUT(self):
         """Handle PUT requests from client"""
 
