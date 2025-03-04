@@ -1,7 +1,10 @@
 from http.server import HTTPServer
 from request_handler import RequestHandler, status
 import json
-from views import User, Post
+
+from views import User
+from views.tag import Tag
+
 
 banner = r"""
                                                        _
@@ -16,6 +19,10 @@ banner = r"""
 class RareApi(RequestHandler):
     def do_GET(self):
         """Handle Get requests from client"""
+        url = self.parse_url(self.path)
+        if url["requested_resource"] == "tags":
+            response = Tag().get_all()
+            return self.response(response, status.HTTP_200_SUCCESS)
 
     def do_POST(self):
         """Handle POST requests from client"""
@@ -38,6 +45,12 @@ class RareApi(RequestHandler):
                 return self.response(response, status.HTTP_200_SUCCESS)
             else:
                 return self.response(response, status.HTTP_406_CLIENT_ERROR_NOT_ACCEPTABLE)
+
+        if url["requested_resource"] == "tags":
+            response = Tag().create_tag(request)
+            if response == True:
+                return self.response("",status.HTTP_201_SUCCESS_CREATED)
+            return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
 
     def do_PUT(self):
         """Handle PUT requests from client"""
