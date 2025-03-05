@@ -6,13 +6,23 @@ class Post:
     def create_post(self, post):
         # Opens connection to database file
         with sqlite3.connect("./db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
             # Allows for Data Selecting Functionality
             db_cursor = conn.cursor()
+            # Creates a list of fields that need to be sent in POST request body
+            required_fields = ["user_id", "category_id", "title", "publication_date", "content"]
+
+            for field in required_fields:
+                # Iterates the list of requirements with what was sent by client
+                if not post.get(field):
+                    # Stops POST command because not all required fields were met
+                    return False
 
             db_cursor.execute(
                 """
                 INSERT INTO Posts
-                (user_id, category_id, title, publication_date, image_url, content, approved) VALUES (?, ?, ?, ?, ?, ?, ?)
+                (user_id, category_id, title, publication_date, image_url, content, approved) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
 
             """,
                 (
@@ -25,6 +35,10 @@ class Post:
                     post["approved"],
                 ),
             )
+            row_affected = db_cursor.rowcount
+
+            return True if row_affected > 0 else False
+            
 
     def list_posts(self):
         """Get all posts from the database"""
