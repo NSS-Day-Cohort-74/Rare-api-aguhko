@@ -29,6 +29,10 @@ class RareApi(RequestHandler):
         elif url["requested_resource"] == "categories":
             response = Category().get_all()
             return self.response(response, status.HTTP_200_SUCCESS)
+        elif url["requested_resource"] == "posts":
+            print("Fetching posts...")
+            response_body = Post().list_posts()
+            return self.response(json.dumps(response_body), status.HTTP_200_SUCCESS)
 
     def do_POST(self):
         """Handle POST requests from client"""
