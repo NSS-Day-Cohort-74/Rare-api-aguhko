@@ -3,6 +3,8 @@ from request_handler import RequestHandler, status
 import json
 
 from views import User
+from views.category import Category
+from views.posts import Post
 from views.tag import Tag
 
 
@@ -24,6 +26,10 @@ class RareApi(RequestHandler):
             response = Tag().get_all()
             return self.response(response, status.HTTP_200_SUCCESS)
 
+        elif url["requested_resource"] == "categories":
+            response = Category().get_all()
+            return self.response(response, status.HTTP_200_SUCCESS)
+
     def do_POST(self):
         """Handle POST requests from client"""
         url = self.parse_url(self.path)
@@ -39,15 +45,21 @@ class RareApi(RequestHandler):
             response = User().create_user(request)
             return self.response(response, status.HTTP_201_SUCCESS_CREATED)
 
-        if url["requested_resource"] == "login":
+        elif url["requested_resource"] == "login":
             response = User().login_user(request)
             if json.loads(response)["valid"] == True:
                 return self.response(response, status.HTTP_200_SUCCESS)
             else:
                 return self.response(response, status.HTTP_406_CLIENT_ERROR_NOT_ACCEPTABLE)
 
-        if url["requested_resource"] == "tags":
+        elif url["requested_resource"] == "tags":
             response = Tag().create_tag(request)
+            if response == True:
+                return self.response("",status.HTTP_201_SUCCESS_CREATED)
+            return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
+
+        elif url["requested_resource"] == "categories":
+            response = Category().create_category(request)
             if response == True:
                 return self.response("",status.HTTP_201_SUCCESS_CREATED)
             return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)

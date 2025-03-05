@@ -1,51 +1,51 @@
 import sqlite3
 import json
 
-class Tag():
-    """class for interacting with Tags from database"""
+class Category():
+    """class for interacting with Categories from database"""
 
     def get_all(self):
-        """Gets tags in the database
+        """Gets categories in the database
     
         Args:
             None
     
         Returns:
-            all tags
+            all categories
         """
         with sqlite3.connect('./db.sqlite3') as conn:
             conn.row_factory = sqlite3.Row
             db_cursor = conn.cursor()
     
             db_cursor.execute("""
-                SELECT id, label from Tags
+                SELECT id, label from Categories
                 ORDER BY LOWER(label) ASC;
             """)
     
-            tags_from_db = db_cursor.fetchall()
+            categories_from_db = db_cursor.fetchall()
 
-            tags = []
+            categories = []
 
-            for tag in tags_from_db:
-                tag = {
-                    "id": tag["id"],
-                    "label": tag["label"]
+            for category in categories_from_db:
+                category = {
+                    "id": category["id"],
+                    "label": category["label"]
 
                 }
-                tags.append(dict(tag))
+                categories.append(dict(category))
     
     
-            return json.dumps(tags)
+            return json.dumps(categories)
     
     
-    def create_tag(self, newTag):
+    def create_category(self, new_category ):
         with sqlite3.connect("./db.sqlite3") as conn:
             db_cursor = conn.cursor()
             db_cursor.execute("""
-               INSERT INTO 'Tags' (label)
+               INSERT INTO 'Categories' (label)
                VALUES 
                (?)
-               """, ( newTag["label"], ),
+               """, ( new_category["label"], ),
             )
             rows_affected = db_cursor.rowcount
 
