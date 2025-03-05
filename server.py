@@ -43,8 +43,11 @@ class RareApi(RequestHandler):
         request = json.loads(request_body.decode("UTF-8"))
 
         if url["requested_resource"] == "posts":
-            Post().create_post(request)
-            return self.response("", status.HTTP_201_SUCCESS_CREATED)
+            post_created = Post().create_post(request)
+            if post_created:
+                return self.response("", status.HTTP_201_SUCCESS_CREATED)
+            else:
+                return self.response("", status.HTTP_422_CLIENT_ERROR_UNPROCESSABLE_ENTITY)
         elif url["requested_resource"] == "register":
             response = User().create_user(request)
             return self.response(response, status.HTTP_201_SUCCESS_CREATED)
