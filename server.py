@@ -2,7 +2,7 @@ from http.server import HTTPServer
 from request_handler import RequestHandler, status
 import json
 
-from views import User
+from views import User, list_posts
 from views.category import Category
 from views.posts import Post
 from views.tag import Tag
@@ -29,6 +29,10 @@ class RareApi(RequestHandler):
         elif url["requested_resource"] == "categories":
             response = Category().get_all()
             return self.response(response, status.HTTP_200_SUCCESS)
+        elif url["requested_resource"] == "posts":
+            print("Fetching posts...")
+            response_body = list_posts()
+            return self.response(json.dumps(response_body), status.HTTP_200_SUCCESS)
 
     def do_POST(self):
         """Handle POST requests from client"""
