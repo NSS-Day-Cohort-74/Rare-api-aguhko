@@ -33,7 +33,7 @@ The Rare API is a RESTful interface built on Python's HTTP server framework, pro
 4. Start the server:
 
    ```bash
-   python main.py
+   python server.py
    ```
 
 ## Authentication Endpoints
