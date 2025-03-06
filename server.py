@@ -29,14 +29,30 @@ class RareApi(RequestHandler):
         elif url["requested_resource"] == "categories":
             response = Category().get_all()
             return self.response(response, status.HTTP_200_SUCCESS)
+
         elif url["requested_resource"] == "posts":
             if "user_id" in url["query_params"]:
                 response_body = Post().get_user_posts(url["query_params"])
                 return self.response(response_body, status.HTTP_200_SUCCESS)
             else:
-                print("Fetching posts...")
                 response_body = Post().list_posts()
                 return self.response(json.dumps(response_body), status.HTTP_200_SUCCESS)
+
+        elif url["requested_resource"] == "user-fullname":
+            response_body = "User not Found"
+            if "user_id" in url["query_params"]:
+                response_body = User().get_user_full_name(
+                    url["query_params"]["user_id"][0]
+                )
+                return self.response(response_body, status.HTTP_200_SUCCESS)
+            return self.response(
+                response_body, status.HTTP_404_CLIENT_ERROR_RESOURCE_NOT_FOUND
+            )
+
+        elif url["requested_resource"] == "users":
+            response = "NO USERS"
+            response_body = User().get_all_users()
+            return self.response(response_body, status.HTTP_200_SUCCESS)
 
     def do_POST(self):
         """Handle POST requests from client"""
@@ -51,7 +67,9 @@ class RareApi(RequestHandler):
             if post_created:
                 return self.response("", status.HTTP_201_SUCCESS_CREATED)
             else:
-                return self.response("", status.HTTP_422_CLIENT_ERROR_UNPROCESSABLE_ENTITY)
+                return self.response(
+                    "", status.HTTP_422_CLIENT_ERROR_UNPROCESSABLE_ENTITY
+                )
         elif url["requested_resource"] == "register":
             response = User().create_user(request)
             return self.response(response, status.HTTP_201_SUCCESS_CREATED)
@@ -61,18 +79,20 @@ class RareApi(RequestHandler):
             if json.loads(response)["valid"] == True:
                 return self.response(response, status.HTTP_200_SUCCESS)
             else:
-                return self.response(response, status.HTTP_406_CLIENT_ERROR_NOT_ACCEPTABLE)
+                return self.response(
+                    response, status.HTTP_406_CLIENT_ERROR_NOT_ACCEPTABLE
+                )
 
         elif url["requested_resource"] == "tags":
             response = Tag().create_tag(request)
             if response == True:
-                return self.response("",status.HTTP_201_SUCCESS_CREATED)
+                return self.response("", status.HTTP_201_SUCCESS_CREATED)
             return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
 
         elif url["requested_resource"] == "categories":
             response = Category().create_category(request)
             if response == True:
-                return self.response("",status.HTTP_201_SUCCESS_CREATED)
+                return self.response("", status.HTTP_201_SUCCESS_CREATED)
             return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
 
     def do_PUT(self):
