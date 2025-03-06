@@ -90,4 +90,9 @@ INSERT INTO Tags ('label') VALUES ('JavaScript');
 INSERT INTO Reactions ('label', 'image_url') VALUES ('happy', 'https://pngtree.com/so/happy');
 
 INSERT INTO Posts ('user_id', 'category_id', 'title', 'publication_date', 'image_url', 'content','approved') 
-VALUES (1, 3, 'how to code', '2024-02-04', 'url.photo', 'coding', 'false')
+VALUES (1, 1, 'how to code', '2024-02-04', 'url.photo', 'coding', 'false')
+
+INSERT INTO PostTags ('post_id', 'tag_id') VALUES (2, 1);
+INSERT INTO PostTags ('post_id', 'tag_id') VALUES (3, 2);
+INSERT INTO Posts ('user_id', 'category_id', 'title', 'publication_date', 'image_url', 'content','approved') 
+VALUES (2, 2, 'Hearty Soups', '2024-02-02', 'url.photo', 'Health', 'false')

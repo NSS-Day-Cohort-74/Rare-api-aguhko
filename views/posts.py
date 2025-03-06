@@ -98,3 +98,23 @@ class Post:
 
             return user_posts_json
         
+    
+    def list_post_tags(self):
+        with sqlite3.connect("./db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
+            db_cursor = conn.cursor()
+
+            db_cursor.execute("""
+            SELECT
+                p.id,
+                p.post_id,
+                p.tag_id
+            FROM PostTags p
+            """)
+
+            query_results = db_cursor.fetchall()
+
+            # Convert rows to a list of dictionaries
+            post_tags = [dict(row) for row in query_results]
+
+        return post_tags
