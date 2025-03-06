@@ -1,5 +1,5 @@
 import sqlite3
-
+import json
 
 class Post:
     
@@ -65,4 +65,36 @@ class Post:
             posts = [dict(row) for row in query_results]
 
         return posts
-            
+
+    def get_user_posts(self, query_params):
+        with sqlite3.connect("./db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
+            db_cursor = conn.cursor()
+            user_id = int(query_params["user_id"][0])
+            db_cursor.execute(
+                """
+                SELECT
+                    p.id,
+                    p.user_id,
+                    p.category_id,
+                    p.title,
+                    p.publication_date,
+                    p.image_url,
+                    p.content,
+                    p.approved
+                FROM Posts p
+                WHERE p.user_id = ?
+                """, (user_id,)
+            )
+
+            query_results = db_cursor.fetchall()
+
+            user_posts = []
+
+            for result in query_results:
+                user_posts.append(dict(result))
+
+            user_posts_json = json.dumps(user_posts)
+
+            return user_posts_json
+        
