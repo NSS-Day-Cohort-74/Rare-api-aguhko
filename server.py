@@ -34,10 +34,13 @@ class RareApi(RequestHandler):
             if "user_id" in url["query_params"]:
                 response_body = Post().get_user_posts(url["query_params"])
                 return self.response(response_body, status.HTTP_200_SUCCESS)
+            elif "post_id" in url["query_params"]:
+                response_body = Post().get_post_by_id(url["query_params"])
+                return self.response(response_body, status.HTTP_200_SUCCESS)
             else:
                 response_body = Post().list_posts()
                 return self.response(json.dumps(response_body), status.HTTP_200_SUCCESS)
-
+            
         elif url["requested_resource"] == "user-fullname":
             response_body = "User not Found"
             if "user_id" in url["query_params"]:
