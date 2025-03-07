@@ -1,8 +1,8 @@
 import sqlite3
 import json
 
+
 class Post:
-    
     def create_post(self, post):
         # Opens connection to database file
         with sqlite3.connect("./db.sqlite3") as conn:
@@ -10,7 +10,13 @@ class Post:
             # Allows for Data Selecting Functionality
             db_cursor = conn.cursor()
             # Creates a list of fields that need to be sent in POST request body
-            required_fields = ["user_id", "category_id", "title", "publication_date", "content"]
+            required_fields = [
+                "user_id",
+                "category_id",
+                "title",
+                "publication_date",
+                "content",
+            ]
 
             for field in required_fields:
                 # Iterates the list of requirements with what was sent by client
@@ -38,7 +44,6 @@ class Post:
             row_affected = db_cursor.rowcount
 
             return True if row_affected > 0 else False
-            
 
     def list_posts(self):
         """Get all posts from the database"""
@@ -81,10 +86,12 @@ class Post:
                     p.publication_date,
                     p.image_url,
                     p.content,
-                    p.approved
+                    p.approved,
+                    p.created_at
                 FROM Posts p
                 WHERE p.user_id = ?
-                """, (user_id,)
+                """,
+                (user_id,),
             )
 
             query_results = db_cursor.fetchall()
@@ -97,4 +104,4 @@ class Post:
             user_posts_json = json.dumps(user_posts)
 
             return user_posts_json
-        
+

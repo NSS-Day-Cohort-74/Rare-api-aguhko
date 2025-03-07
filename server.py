@@ -54,6 +54,11 @@ class RareApi(RequestHandler):
             response_body = User().get_all_users()
             return self.response(response_body, status.HTTP_200_SUCCESS)
 
+        else:
+            return self.response(
+                "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
+            )
+
     def do_POST(self):
         """Handle POST requests from client"""
         url = self.parse_url(self.path)
@@ -68,7 +73,8 @@ class RareApi(RequestHandler):
                 return self.response("", status.HTTP_201_SUCCESS_CREATED)
             else:
                 return self.response(
-                    "", status.HTTP_422_CLIENT_ERROR_UNPROCESSABLE_ENTITY
+                    "Validation error",
+                    status.HTTP_422_CLIENT_ERROR_UNPROCESSABLE_ENTITY,
                 )
         elif url["requested_resource"] == "register":
             response = User().create_user(request)
@@ -76,7 +82,7 @@ class RareApi(RequestHandler):
 
         elif url["requested_resource"] == "login":
             response = User().login_user(request)
-            if json.loads(response)["valid"] == True:
+            if json.loads(response)["valid"]:
                 return self.response(response, status.HTTP_200_SUCCESS)
             else:
                 return self.response(
@@ -85,21 +91,41 @@ class RareApi(RequestHandler):
 
         elif url["requested_resource"] == "tags":
             response = Tag().create_tag(request)
-            if response == True:
-                return self.response("", status.HTTP_201_SUCCESS_CREATED)
-            return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
+            if response:
+                return self.response(
+                    json.dumps({"message": "Success"}), status.HTTP_201_SUCCESS_CREATED
+                )
+            return self.response(
+                json.dumps({"message": "Validation error"}),
+                status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA,
+            )
 
         elif url["requested_resource"] == "categories":
             response = Category().create_category(request)
-            if response == True:
-                return self.response("", status.HTTP_201_SUCCESS_CREATED)
-            return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
+            if response:
+                return self.response(
+                    json.dumps({"created": "true"}), status.HTTP_201_SUCCESS_CREATED
+                )
+            return self.response(
+                json.dumps({"created": "true"}),
+                status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA,
+            )
+        else:
+            return self.response(
+                "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
+            )
 
     def do_PUT(self):
         """Handle PUT requests from client"""
+        return self.response(
+            "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
+        )
 
     def do_DELETE(self):
         """Handle DELETE requests from client"""
+        return self.response(
+            "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
+        )
 
 
 def main():
