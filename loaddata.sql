@@ -88,9 +88,3 @@ CREATE TABLE "Categories" (
 INSERT INTO Categories ('label') VALUES ('News');
 INSERT INTO Tags ('label') VALUES ('JavaScript');
 INSERT INTO Reactions ('label', 'image_url') VALUES ('happy', 'https://pngtree.com/so/happy');
-
-INSERT INTO Posts ('user_id', 'category_id', 'title', 'publication_date', 'image_url', 'content','approved') 
-VALUES (1, 3, 'how to code', '2024-02-04', 'url.photo', 'coding', 'false');
-
-UPDATE Posts
-SET "image_url" = 'https://static.wikia.nocookie.net/pixar/images/7/79/Bookworm.png/12315';
