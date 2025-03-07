@@ -45,11 +45,11 @@ class Post:
         with sqlite3.connect("./db.sqlite3") as conn:
             conn.row_factory = sqlite3.Row
             db_cursor = conn.cursor()
-
             db_cursor.execute("""
-            SELECT
+                SELECT
                 p.id,
                 p.user_id,
+                CONCAT(u.first_name, " ", u.last_name) as full_name,
                 p.category_id,
                 p.title,
                 p.publication_date,
@@ -57,6 +57,8 @@ class Post:
                 p.content,
                 p.approved
             FROM Posts p
+                JOIN Users u
+                ON p.user_id = u.id                                  
             """)
 
             query_results = db_cursor.fetchall()
@@ -64,7 +66,7 @@ class Post:
             # Convert rows to a list of dictionaries
             posts = [dict(row) for row in query_results]
 
-        return posts
+            return posts
 
     def get_user_posts(self, query_params):
         with sqlite3.connect("./db.sqlite3") as conn:
@@ -76,6 +78,7 @@ class Post:
                 SELECT
                     p.id,
                     p.user_id,
+                    CONCAT(u.first_name, " ", u.last_name) as full_name,
                     p.category_id,
                     p.title,
                     p.publication_date,
@@ -84,6 +87,8 @@ class Post:
                     p.approved
                 FROM Posts p
                 WHERE p.user_id = ?
+                    JOIN Users u
+                    ON p.user_id = u.id                
                 """, (user_id,)
             )
 
@@ -97,4 +102,36 @@ class Post:
             user_posts_json = json.dumps(user_posts)
 
             return user_posts_json
-        
+    
+    def get_post_by_id(self, query_params):
+        with sqlite3.connect("./db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
+            db_cursor = conn.cursor()
+            post_id = int(query_params["post_id"][0])
+            db_cursor.execute(
+                """
+                SELECT 
+                    p.id,
+                    p.user_id,
+                    CONCAT(u.first_name, " ", u.last_name) as full_name,
+                    p.category_id,
+                    c.label category_name,
+                    p.title,
+                    p.publication_date,
+                    p.image_url,
+                    p.content,
+                    p.approved
+                FROM Posts p
+                    JOIN Users u
+                    ON p.user_id = u.id
+                    JOIN Categories c
+                    ON p.category_id = c.id
+                WHERE p.id = ?
+                """, (post_id,)
+                )
+
+            query_result = db_cursor.fetchone()
+
+            query_result_as_dict = dict(query_result)
+            query_result_as_json = json.dumps(query_result_as_dict)
+            return query_result_as_json
