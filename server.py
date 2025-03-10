@@ -73,7 +73,7 @@ class RareApi(RequestHandler):
         if url["requested_resource"] == "posts":
             post_created = Post().create_post(request)
             if post_created:
-                return self.response("", status.HTTP_201_SUCCESS_CREATED)
+                return self.response(post_created, status.HTTP_201_SUCCESS_CREATED)
             else:
                 return self.response(
                     "Validation error",
