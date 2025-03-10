@@ -41,9 +41,32 @@ class Post:
                     post["approved"],
                 ),
             )
-            row_affected = db_cursor.rowcount
+            # row_affected = db_cursor.rowcount
 
-            return True if row_affected > 0 else False
+            # return True if row_affected > 0 else False
+
+            db_cursor.execute(
+                """ 
+                SELECT
+                    p.id,
+                    p.user_id,
+                    p.category_id,
+                    p.title,
+                    p.publication_date,
+                    p.image_url,
+                    p.content,
+                    p.approved
+                FROM Posts p
+                ORDER BY Id DESC
+                LIMIT 1
+                """
+            )
+
+            last_created_item = db_cursor.fetchone()
+
+            last_created_item_as_dictionary = dict(last_created_item)
+            last_created_item_as_json = json.dumps(last_created_item_as_dictionary)
+            return last_created_item_as_json
 
     def list_posts(self):
         """Get all posts from the database"""
