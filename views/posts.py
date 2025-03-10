@@ -89,12 +89,11 @@ class Post:
                     p.publication_date,
                     p.image_url,
                     p.content,
-                    p.approved,
-                    p.created_at
+                    p.approved
                 FROM Posts p
+                JOIN Users u
+                ON p.user_id = u.id                
                 WHERE p.user_id = ?
-                    JOIN Users u
-                    ON p.user_id = u.id                
                 """, (user_id,)
             )
 
