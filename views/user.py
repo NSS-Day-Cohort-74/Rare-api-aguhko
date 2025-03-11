@@ -121,11 +121,12 @@ class User:
                     """
                     SELECT
                         id,
-                        CONCAT(first_name + " " + last_name) AS full_name,
+                        CONCAT(first_name,  " " , last_name) AS full_name,
                         username,
                         email,
                         bio,
                         created_on,
+                        profile_image_url,
                         active 
                     from Users
                     """
