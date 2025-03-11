@@ -126,6 +126,14 @@ class RareApi(RequestHandler):
 
     def do_DELETE(self):
         """Handle DELETE requests from client"""
+        url = self.parse_url(self.path)
+
+        if url["requested_resource"] == "posts":
+            if url["pk"]:
+                response = Post().delete_a_post(url["pk"])
+                return self.response("", status.HTTP_200_SUCCESS)
+            else:
+                return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
         return self.response(
             "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
         )

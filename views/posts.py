@@ -163,3 +163,18 @@ class Post:
             query_result_as_dict = dict(query_result)
             query_result_as_json = json.dumps(query_result_as_dict)
             return query_result_as_json
+        
+    def delete_a_post(self, primary_key):
+        with sqlite3.connect("./db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
+            db_cursor = conn.cursor()
+
+            db_cursor.execute(
+                """
+                DELETE FROM Posts
+                WHERE id = ? 
+                """, (primary_key,)
+            )
+
+            number_of_row_deleted = db_cursor.rowcount
+            return True if number_of_row_deleted > 0 else False
