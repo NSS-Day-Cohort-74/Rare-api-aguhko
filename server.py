@@ -29,6 +29,12 @@ class RareApi(RequestHandler):
         elif url["requested_resource"] == "categories":
             response = Category().get_all()
             return self.response(response, status.HTTP_200_SUCCESS)
+        elif url["requested_resource"] == "subscribed-posts":
+            if "subscriber_id" in url["query_params"]:
+                user_id = url["query_params"]["subscriber_id"][0]
+                response_body = Post().get_subscribed_to_users_posts(user_id)
+                return self.response(response_body, status.HTTP_200_SUCCESS)
+            return self.response("please use the 'subscriber_id' param", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
 
         elif url["requested_resource"] == "posts":
             if "user_id" in url["query_params"]:
