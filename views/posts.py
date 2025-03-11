@@ -117,7 +117,8 @@ class Post:
                 JOIN Users u
                 ON p.user_id = u.id                
                 WHERE p.user_id = ?
-                """, (user_id,)
+                """,
+                (user_id,),
             )
 
             query_results = db_cursor.fetchall()
@@ -130,7 +131,7 @@ class Post:
             user_posts_json = json.dumps(user_posts)
 
             return user_posts_json
-    
+
     def get_post_by_id(self, query_params):
         with sqlite3.connect("./db.sqlite3") as conn:
             conn.row_factory = sqlite3.Row
@@ -155,15 +156,16 @@ class Post:
                     JOIN Categories c
                     ON p.category_id = c.id
                 WHERE p.id = ?
-                """, (post_id,)
-                )
+                """,
+                (post_id,),
+            )
 
             query_result = db_cursor.fetchone()
 
             query_result_as_dict = dict(query_result)
             query_result_as_json = json.dumps(query_result_as_dict)
             return query_result_as_json
-        
+
     def delete_a_post(self, primary_key):
         with sqlite3.connect("./db.sqlite3") as conn:
             conn.row_factory = sqlite3.Row
@@ -173,8 +175,38 @@ class Post:
                 """
                 DELETE FROM Posts
                 WHERE id = ? 
-                """, (primary_key,)
+                """,
+                (primary_key,),
             )
 
             number_of_row_deleted = db_cursor.rowcount
             return True if number_of_row_deleted > 0 else False
+
+    def get_subscribed_to_users_posts(self, user_id):
+        with sqlite3.connect("./db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
+            db_cursor = conn.cursor()
+
+            db_cursor.execute(
+                """
+                SELECT 
+                p.*,
+                c.label AS category_label,
+                u.first_name || ' ' || u.last_name AS author_name
+
+                FROM Posts p
+                JOIN Subscriptions s ON p.user_id = s.author_id
+
+                JOIN Categories c ON p.category_id = c.id
+
+                JOIN Users u ON p.user_id = u.id
+
+                WHERE s.follower_id = ?;
+
+                """,
+                (user_id,),
+            )
+
+            query_result = db_cursor.fetchall()
+            sub_posts = [dict(row) for row in query_result]
+            return json.dumps(sub_posts)
