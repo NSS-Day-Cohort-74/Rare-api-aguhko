@@ -130,7 +130,7 @@ class RareApi(RequestHandler):
 
         if url["requested_resource"] == "posts":
             if url["pk"]:
-                response = Post().delete_a_post(int(url["pk"]))
+                response = Post().delete_a_post(url["pk"])
                 return self.response("", status.HTTP_200_SUCCESS)
             else:
                 return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
