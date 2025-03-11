@@ -103,46 +103,70 @@ class User:
 
             return json.dumps(response)
 
-    def get_all_users(self):
-        """gets all Users in the database
+    def get_users(self, url):
+        """
+        gets all Users in the database ||  single user if pk in url
+
+        Args: url [dict]
 
         Returns:
-            json string: of users
+            json string: of users || a single user
         """
-        with sqlite3.connect("./db.sqlite3") as conn:
-            conn.row_factory = sqlite3.Row
-            db_cursor = conn.cursor()
+        if url["pk"] != 0:
+            with sqlite3.connect("./db.sqlite3") as conn:
+                conn.row_factory = sqlite3.Row
+                db_cursor = conn.cursor()
 
-            db_cursor.execute(
-                """
-                SELECT
-                id,
-                first_name,
-                last_name,
-                username,
-                email,
-                password,
-                bio,
-                created_on,
-                active 
-                from Users
-            """
-            )
+                db_cursor.execute(
+                    """
+                    SELECT
+                        id,
+                        CONCAT(first_name,  " " , last_name) AS full_name,
+                        username,
+                        email,
+                        bio,
+                        created_on,
+                        profile_image_url,
+                        active 
+                    from Users
+                    """
+                )
+                user_from_db = db_cursor.fetchone()
 
-            users_from_db = db_cursor.fetchall()
-            all_users = []
+                return json.dumps(dict(user_from_db))
+        else:
+            with sqlite3.connect("./db.sqlite3") as conn:
+                conn.row_factory = sqlite3.Row
+                db_cursor = conn.cursor()
 
-            for user in users_from_db:
-                user = {
-                    "id": user["id"],
-                    "first_name": user["first_name"],
-                    "last_name": user["last_name"],
-                    "username": user["username"],
-                    "email": user["email"],
-                    "bio": user["bio"],
-                    "created_on": user["created_on"],
-                    "active": user["active"],
-                }
-                all_users.append(user)
+                db_cursor.execute(
+                    """
+                    SELECT
+                        id,
+                        first_name,
+                        last_name,
+                        username,
+                        email,
+                        bio,
+                        created_on,
+                        active 
+                    from Users
+                    """
+                )
+                users_from_db = db_cursor.fetchall()
+                all_users = []
 
-            return json.dumps(all_users)
+                for user in users_from_db:
+                    user = {
+                        "id": user["id"],
+                        "first_name": user["first_name"],
+                        "last_name": user["last_name"],
+                        "username": user["username"],
+                        "email": user["email"],
+                        "bio": user["bio"],
+                        "created_on": user["created_on"],
+                        "active": user["active"],
+                    }
+                    all_users.append(user)
+
+                return json.dumps(all_users)
