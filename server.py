@@ -8,6 +8,7 @@ from views.posts import Post
 from views.tag import Tag
 from views import Subscription
 
+from views.comment import Comment
 
 banner = r"""
                                                        _
@@ -69,7 +70,9 @@ class RareApi(RequestHandler):
             response = "NO USERS"
             response_body = User().get_users(url)
             return self.response(response_body, status.HTTP_200_SUCCESS)
-
+        elif url["requested_resource"] == "comments":
+            response = Comment().get_all()
+            return self.response(response, status.HTTP_200_SUCCESS)
         else:
             return self.response(
                 "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
