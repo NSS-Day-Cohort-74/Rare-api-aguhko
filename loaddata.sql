@@ -8,6 +8,7 @@ CREATE TABLE "Users" (
   "password" varchar,
   "profile_image_url" varchar,
   "created_on" date,
+  "is_admin" varchar,
   "active" bit
 );
 
@@ -97,11 +98,11 @@ SET "image_url" = 'https://static.wikia.nocookie.net/pixar/images/7/79/Bookworm.
 
 
 -- Insert sample users
-INSERT INTO Users (first_name, last_name, email, bio, username, password, profile_image_url, created_on, active) VALUES
-('John', 'Doe', 'john.doe@example.com', 'A software developer.', 'johndoe', 'password123', 'https://example.com/images/john.jpg', '2024-01-01', 1),
-('Jane', 'Smith', 'jane.smith@example.com', 'A graphic designer.', 'janesmith', 'password123', 'https://example.com/images/jane.jpg', '2024-01-02', 1),
-('Alice', 'Johnson', 'alice.johnson@example.com', 'A content writer.', 'alicejohnson', 'password123', 'https://example.com/images/alice.jpg', '2024-01-03', 1),
-('Bob', 'Brown', 'bob.brown@example.com', 'A project manager.', 'bobbrown', 'password123', 'https://example.com/images/bob.jpg', '2024-01-04', 1);
+INSERT INTO Users (is_admin,first_name, last_name, email, bio, username, password, profile_image_url, created_on, active) VALUES
+('true','John', 'Doe', 'john.doe@example.com', 'A software developer.', 'johndoe', 'password123', 'https://example.com/images/john.jpg', '2024-01-01', 1),
+('false','Jane', 'Smith', 'jane.smith@example.com', 'A graphic designer.', 'janesmith', 'password123', 'https://example.com/images/jane.jpg', '2024-01-02', 1),
+('false','Alice', 'Johnson', 'alice.johnson@example.com', 'A content writer.', 'alicejohnson', 'password123', 'https://example.com/images/alice.jpg', '2024-01-03', 1),
+('true','Bob', 'Brown', 'bob.brown@example.com', 'A project manager.', 'bobbrown', 'password123', 'https://example.com/images/bob.jpg', '2024-01-04', 1);
 
 -- Insert sample categories
 INSERT INTO Categories (label) VALUES 
