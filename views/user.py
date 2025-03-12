@@ -103,7 +103,7 @@ class User:
 
             return json.dumps(response)
 
-    def get_users(self, url):
+    def  get_users(self, url):
         """
         gets all Users in the database ||  single user if pk in url
 
@@ -116,7 +116,7 @@ class User:
             with sqlite3.connect("./db.sqlite3") as conn:
                 conn.row_factory = sqlite3.Row
                 db_cursor = conn.cursor()
-
+                user_primary_key = int(url["pk"])
                 db_cursor.execute(
                     """
                     SELECT
@@ -129,7 +129,8 @@ class User:
                         profile_image_url,
                         active 
                     from Users
-                    """
+                    WHERE id = ?
+                    """, (user_primary_key,)
                 )
                 user_from_db = db_cursor.fetchone()
 
