@@ -22,7 +22,7 @@ class User:
 
             db_cursor.execute(
                 """
-                SELECT id, username
+                SELECT id, username, is_admin
                 from Users
                 where username = ?
                 and password = ?
@@ -33,7 +33,13 @@ class User:
             user_from_db = db_cursor.fetchone()
 
             if user_from_db is not None:
-                response = {"valid": True, "token": user_from_db["id"]}
+                response = {
+                    "valid": True,
+                    "auth": {
+                        "token": user_from_db["id"],
+                        "isAdmin": bool(user_from_db["is_admin"] == "true"),
+                    },
+                }
             else:
                 response = {"valid": False}
 
@@ -103,7 +109,7 @@ class User:
 
             return json.dumps(response)
 
-    def  get_users(self, url):
+    def get_users(self, url):
         """
         gets all Users in the database ||  single user if pk in url
 
@@ -127,14 +133,19 @@ class User:
                         bio,
                         created_on,
                         profile_image_url,
-                        active 
+                        active,
+                        is_admin
                     from Users
                     WHERE id = ?
-                    """, (user_primary_key,)
+                    """,
+                    (user_primary_key,),
                 )
                 user_from_db = db_cursor.fetchone()
+                user_from_db = dict(user_from_db)
 
-                return json.dumps(dict(user_from_db))
+                user_from_db["is_admin"] = bool(user_from_db["is_admin"] == "true")
+
+                return json.dumps(user_from_db)
         else:
             with sqlite3.connect("./db.sqlite3") as conn:
                 conn.row_factory = sqlite3.Row
@@ -150,7 +161,8 @@ class User:
                         email,
                         bio,
                         created_on,
-                        active 
+                        active, 
+                        is_admin
                     from Users
                     """
                 )
@@ -167,6 +179,7 @@ class User:
                         "bio": user["bio"],
                         "created_on": user["created_on"],
                         "active": user["active"],
+                        "is_admin": bool(user["is_admin"] == "true"),
                     }
                     all_users.append(user)
 
