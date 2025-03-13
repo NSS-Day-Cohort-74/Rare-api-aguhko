@@ -73,28 +73,67 @@ class Post:
         with sqlite3.connect("./db.sqlite3") as conn:
             conn.row_factory = sqlite3.Row
             db_cursor = conn.cursor()
-            db_cursor.execute("""
+            db_cursor.execute(
+                """
                 SELECT
-                p.id,
-                p.user_id,
-                CONCAT(u.first_name, " ", u.last_name) as full_name,
-                p.category_id,
-                p.title,
-                p.publication_date,
-                p.image_url,
-                p.content,
-                p.approved
+                     p.id,
+                     p.user_id,
+                     CONCAT(u.first_name, " ", u.last_name) AS full_name,
+                     p.category_id,
+                     c.label AS category_name,
+                     t.id AS tag_id,
+                     t.label AS tag_name,
+                     p.title,
+                     p.publication_date,
+                     p.image_url,
+                     p.content,
+                     p.approved
             FROM Posts p
                 JOIN Users u
-                ON p.user_id = u.id                                  
-            """)
+                    ON p.user_id = u.id                                  
+                JOIN Categories c
+                    ON c.id = p.category_id
+                LEFT JOIN PostTags pt
+                    ON p.id = pt.post_id
+                LEFT JOIN Tags t
+                    ON t.id = pt.tag_id
+            """
+            )
 
             query_results = db_cursor.fetchall()
 
-            # Convert rows to a list of dictionaries
-            posts = [dict(row) for row in query_results]
+            posts = []
+            # Converting SQLite Rows to Python dictionaries, adding them to a list
+            for result in query_results:
+                post = dict(result)
+                posts.append(post)
 
-            return posts
+            new_set = set()
+
+            for post in posts:
+                # Destructuring dictionaries for their unique post ids, adding them to a set
+                id, *_ = post.values()
+                new_set.add(id)
+
+            new_posts = []
+            for id in new_set:
+                # Compares unique post ids in posts, removes duplicate entries made by more than one tag
+                unique_posts_by_id = list(filter(lambda post: id == post["id"], posts))
+                tag_list = []
+                # Appends the matching posts' multiple tag_names and tag_ids to a list, as a key in the response body
+                for post in unique_posts_by_id:
+                    tag = {"tag_name": post["tag_name"], "tag_id": post["tag_id"]}
+                    tag_list.append(tag)
+                # Some posts may not have tags, this will set their default value if this is the case
+                if not tag_list[0]["tag_name"]:
+                    tags = None
+                else:
+                    tags = tag_list
+
+                # creates new key/value pair. Value of the key is a list of tags associated with one post
+                new_posts.append({**dict(unique_posts_by_id[0]), "tags": tags})
+
+            return json.dumps(new_posts)
 
     def get_user_posts(self, query_params):
         with sqlite3.connect("./db.sqlite3") as conn:

@@ -7,6 +7,7 @@ from views.category import Category
 from views.posts import Post
 from views.tag import Tag
 from views import Subscription
+from views import test_list_posts
 
 from views.comment import Comment
 
@@ -24,6 +25,7 @@ class RareApi(RequestHandler):
     def do_GET(self):
         """Handle Get requests from client"""
         url = self.parse_url(self.path)
+
         if url["requested_resource"] == "tags":
             response = Tag().get_all()
             return self.response(response, status.HTTP_200_SUCCESS)
@@ -38,12 +40,15 @@ class RareApi(RequestHandler):
                 if response_body:
                     return self.response(response_body, status.HTTP_200_SUCCESS)
                 else:
-                    return self.response("please use the 'subscriber_id' param", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
-                
+                    return self.response(
+                        "please use the 'subscriber_id' param",
+                        status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA,
+                    )
+
         elif url["requested_resource"] == "subscriptions":
             json_subscription_list = Subscription().get_subscriptions()
             return self.response(json_subscription_list, status.HTTP_200_SUCCESS)
-        
+
         elif url["requested_resource"] == "posts":
             if "user_id" in url["query_params"]:
                 response_body = Post().get_user_posts(url["query_params"])
@@ -53,7 +58,7 @@ class RareApi(RequestHandler):
                 return self.response(response_body, status.HTTP_200_SUCCESS)
             else:
                 response_body = Post().list_posts()
-                return self.response(json.dumps(response_body), status.HTTP_200_SUCCESS)
+                return self.response(response_body, status.HTTP_200_SUCCESS)
 
         elif url["requested_resource"] == "user-fullname":
             response_body = "User not Found"
@@ -135,10 +140,9 @@ class RareApi(RequestHandler):
             return self.response("", status.HTTP_201_SUCCESS_CREATED)
         else:
             return self.response(
-            "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
+                "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
             )
-        
-    
+
     def do_PUT(self):
         """Handle PUT requests from client"""
         return self.response(
