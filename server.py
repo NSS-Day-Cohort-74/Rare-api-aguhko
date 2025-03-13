@@ -38,12 +38,15 @@ class RareApi(RequestHandler):
                 if response_body:
                     return self.response(response_body, status.HTTP_200_SUCCESS)
                 else:
-                    return self.response("please use the 'subscriber_id' param", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
-                
+                    return self.response(
+                        "please use the 'subscriber_id' param",
+                        status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA,
+                    )
+
         elif url["requested_resource"] == "subscriptions":
             json_subscription_list = Subscription().get_subscriptions()
             return self.response(json_subscription_list, status.HTTP_200_SUCCESS)
-        
+
         elif url["requested_resource"] == "posts":
             if "user_id" in url["query_params"]:
                 response_body = Post().get_user_posts(url["query_params"])
@@ -129,16 +132,26 @@ class RareApi(RequestHandler):
                 json.dumps({"created": "true"}),
                 status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA,
             )
-
         elif url["requested_resource"] == "subscriptions":
             Subscription().subscribe(request)
             return self.response("", status.HTTP_201_SUCCESS_CREATED)
+
+        elif url["requested_resource"] == "new-comment":
+            response = Comment().create(request)
+            if response:
+                return self.response(
+                    json.dumps({"ok": True}), status.HTTP_201_SUCCESS_CREATED
+                )
+
+            return self.response(
+                json.dumps({"ok": False}), status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA
+            )
+
         else:
             return self.response(
-            "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
+                "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
             )
-        
-    
+
     def do_PUT(self):
         """Handle PUT requests from client"""
         return self.response(
