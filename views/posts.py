@@ -74,25 +74,43 @@ class Post:
             conn.row_factory = sqlite3.Row
             db_cursor = conn.cursor()
             db_cursor.execute("""
-                SELECT
-                p.id,
-                p.user_id,
-                CONCAT(u.first_name, " ", u.last_name) as full_name,
-                p.category_id,
-                p.title,
-                p.publication_date,
-                p.image_url,
-                p.content,
-                p.approved
-            FROM Posts p
-                JOIN Users u
-                ON p.user_id = u.id                                  
+                    SELECT 
+                        p.id ,
+                        p.title ,
+                        p.user_id,
+                        CONCAT(u.first_name, " ", u.last_name) as author_name,
+                        p.content,
+                        p.image_url,
+                        p.category_id,
+                        c.label AS category_name,
+                        p.publication_date,
+                        p.image_url,
+                        p.approved,
+                        GROUP_CONCAT( DISTINCT tg.label) AS tags
+                    FROM 
+                        Posts p
+
+                        JOIN Users u ON u.id = p.user_id
+
+                        JOIN Categories c ON c.id = p.category_id
+                    LEFT JOIN 
+                        PostTags ptg ON p.id = ptg.post_id
+                    LEFT JOIN 
+                        Tags tg ON ptg.tag_id = tg.id
+                    GROUP BY 
+                        p.id
+                    
             """)
 
             query_results = db_cursor.fetchall()
 
-            # Convert rows to a list of dictionaries
-            posts = [dict(row) for row in query_results]
+            posts = []
+            for row in query_results:
+                post = dict(row)
+                if post["tags"]:
+                    post["tags"] = post["tags"].split(",")
+
+                posts.append(post)
 
             return posts
 
@@ -106,17 +124,34 @@ class Post:
                 SELECT
                     p.id,
                     p.user_id,
-                    CONCAT(u.first_name, " ", u.last_name) as full_name,
+                    CONCAT(u.first_name, ' ', u.last_name) AS full_name,
                     p.category_id,
+                    c.label AS category_name,
                     p.title,
                     p.publication_date,
                     p.image_url,
                     p.content,
-                    p.approved
+                    p.approved,
+                    GROUP_CONCAT( DISTINCT tg.label) AS tags
+
                 FROM Posts p
+                
                 JOIN Users u
                 ON p.user_id = u.id                
+
+                JOIN Categories c
+                ON c.id = p.category_id
+
+                LEFT JOIN 
+                    PostTags ptg ON p.id = ptg.post_id
+                LEFT JOIN 
+                    Tags tg ON ptg.tag_id = tg.id
+
                 WHERE p.user_id = ?
+
+                GROUP BY 
+                    p.id
+
                 """,
                 (user_id,),
             )
@@ -126,7 +161,10 @@ class Post:
             user_posts = []
 
             for result in query_results:
-                user_posts.append(dict(result))
+                post = dict(result)
+                if post["tags"]:
+                    post["tags"] = post["tags"].split(",")
+                user_posts.append(post)
 
             user_posts_json = json.dumps(user_posts)
 
@@ -142,20 +180,29 @@ class Post:
                 SELECT 
                     p.id,
                     p.user_id,
-                    CONCAT(u.first_name, " ", u.last_name) as full_name,
+                    CONCAT(u.first_name, ' ', u.last_name) as full_name,
                     p.category_id,
                     c.label category_name,
                     p.title,
                     p.publication_date,
                     p.image_url,
                     p.content,
-                    p.approved
+                    p.approved,
+                    GROUP_CONCAT( DISTINCT tg.label) AS tags
                 FROM Posts p
                     JOIN Users u
                     ON p.user_id = u.id
                     JOIN Categories c
                     ON p.category_id = c.id
+
+                LEFT JOIN 
+                    PostTags ptg ON p.id = ptg.post_id
+                LEFT JOIN 
+                    Tags tg ON ptg.tag_id = tg.id
                 WHERE p.id = ?
+
+                GROUP BY 
+                    p.id
                 """,
                 (post_id,),
             )
@@ -163,6 +210,8 @@ class Post:
             query_result = db_cursor.fetchone()
 
             query_result_as_dict = dict(query_result)
+            if query_result_as_dict["tags"]:
+                query_result_as_dict["tags"] = query_result_as_dict["tags"].split(",")
             query_result_as_json = json.dumps(query_result_as_dict)
             return query_result_as_json
 
@@ -192,7 +241,7 @@ class Post:
                 SELECT 
                 p.*,
                 c.label AS category_label,
-                u.first_name || ' ' || u.last_name AS author_name
+               CONCAT( u.first_name,' ', u.last_name) AS author_name
 
                 FROM Posts p
                 JOIN Subscriptions s ON p.user_id = s.author_id
@@ -201,7 +250,7 @@ class Post:
 
                 JOIN Users u ON p.user_id = u.id
 
-                WHERE s.follower_id = ?;
+                WHERE s.follower_id = ?
 
                 """,
                 (user_id,),

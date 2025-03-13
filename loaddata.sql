@@ -142,3 +142,13 @@ INSERT INTO Comments (post_id, author_id, content) VALUES
 (2, 1, 'I love the design tips!'),
 (3, 4, 'Thanks for the healthy living tips!'),
 (4, 3, 'This is a great introduction to project management.');
+
+
+-- Insert sample posttags
+INSERT INTO PostTags (post_id, tag_id) VALUES 
+(1, 1),
+(2, 2),
+(2, 3),
+(4, 1),
+(4, 2),
+(4, 3);

@@ -23,7 +23,6 @@ class status(Enum):
 
 
 class RequestHandler(BaseHTTPRequestHandler):
-
     def response(self, body, status_code):
         """Response"""
         self.set_res_code(status_code.value)
@@ -45,10 +44,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         try:
             if params[2]:
                 pk = params[2]
-                url_dict["pk"] = pk
-
-            if query:
-                pk = query["pk"][0]
                 url_dict["pk"] = pk
 
         except (IndexError, ValueError):
