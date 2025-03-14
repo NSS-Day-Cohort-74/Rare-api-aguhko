@@ -53,3 +53,23 @@ class Subscription():
                     datetime.now(),
                 ),
             )
+    def unsubscribe(self, subscription):
+        """
+        Removes a subscription relationship from the database
+        Args:
+            dictionary: a key/value pair, one representing the follower and the other the author in a relationship
+        """
+        with sqlite3.connect("./db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
+            db_cursor = conn.cursor()
+
+            db_cursor.execute(
+                """
+                DELETE FROM Subscriptions
+                WHERE follower_id = ? AND author_id = ?""", 
+                (subscription["follower_id"], subscription["author_id"]),
+            )
+
+            number_of_rows_deleted = db_cursor.rowcount
+
+            return True if number_of_rows_deleted > 0 else False
