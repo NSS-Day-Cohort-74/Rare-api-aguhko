@@ -75,7 +75,15 @@ class User:
 
             id = db_cursor.lastrowid
 
-            return json.dumps({"token": id, "valid": True})
+            return json.dumps(
+                {
+                    "valid": True,
+                    "auth": {
+                        "token": id,
+                        "isAdmin": False,
+                    },
+                }
+            )
 
     def get_user_full_name(self, user_id):
         """Checks for the user in the database
