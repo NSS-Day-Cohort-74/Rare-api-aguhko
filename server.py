@@ -162,6 +162,10 @@ class RareApi(RequestHandler):
         """Handle DELETE requests from client"""
         url = self.parse_url(self.path)
 
+        content_len = int(self.headers.get("content-length", 0))
+        request_body = self.rfile.read(content_len)
+        request = json.loads(request_body.decode("UTF-8"))
+
         if url["requested_resource"] == "posts":
             if url["pk"]:
                 response = Post().delete_a_post(url["pk"])
@@ -172,6 +176,11 @@ class RareApi(RequestHandler):
             if url["pk"]:
                 response = Comment().delete_a_comment(url["pk"])
                 return self.response("", status.HTTP_200_SUCCESS)
+        elif url["requested_resource"] == "subscriptions":
+            response = Subscription().unsubscribe(request)
+            if response:
+                return self.response("Deleted",status.HTTP_200_SUCCESS)
+            return self.response("Do better, try harder.", status.HTTP_418_CLIENT_ERROR_IM_A_TEAPOT)
         else:
             return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
         return self.response(
