@@ -27,7 +27,6 @@ class Comment:
         ]  # Convert to list of dictionaries
         return json.dumps(query_result_as_list)  # Convert to JSON
 
-<<<<<<< HEAD
     def delete_a_comment(self, primary_key):
         with sqlite3.connect("./db.sqlite3") as conn:
             conn.row_factory = sqlite3.Row
@@ -35,7 +34,6 @@ class Comment:
 
             db_cursor.execute(
                 """
-<<<<<<< HEAD
                 DELETE FROM Comments
                 WHERE id = ? 
                 """,
@@ -45,8 +43,6 @@ class Comment:
             number_of_row_deleted = db_cursor.rowcount
             return True if number_of_row_deleted > 0 else False
 
-=======
->>>>>>> refs/remotes/origin/feature/add-comment-to-post
     def create(self, new_comment):
         with sqlite3.connect("./db.sqlite3") as conn:
             conn.row_factory = sqlite3.Row
