@@ -43,7 +43,7 @@ class Post:
             )
             new_post_id = db_cursor.lastrowid
 
-            return new_post_id
+            return json.dumps(new_post_id)
 
     def list_posts(self):
         """Get all posts from the database"""
