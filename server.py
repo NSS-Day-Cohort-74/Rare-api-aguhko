@@ -155,6 +155,12 @@ class RareApi(RequestHandler):
                 return self.response("", status.HTTP_200_SUCCESS)
             else:
                 return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
+        elif url["requested_resource"] == "comments":
+            if url["pk"]:
+                response = Comment().delete_a_comment(url["pk"])
+                return self.response("", status.HTTP_200_SUCCESS)
+        else:
+            return self.response("", status.HTTP_400_CLIENT_ERROR_BAD_REQUEST_DATA)
         return self.response(
             "Not Implemented", status.HTTP_501_SERVER_ERROR_NOT_IMPLEMENTED
         )

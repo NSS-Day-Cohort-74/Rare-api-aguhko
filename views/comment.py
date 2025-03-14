@@ -12,6 +12,7 @@ class Comment:
                 c.id,
                 c.post_id,
                 c.content,
+                c.author_id,
                 u.username AS author_name
             FROM Comments c
             JOIN Users u ON c.author_id = u.id
@@ -22,3 +23,19 @@ class Comment:
 
         query_result_as_list = [dict(row) for row in query_result]  # Convert to list of dictionaries
         return json.dumps(query_result_as_list)  # Convert to JSON
+    
+    def delete_a_comment(self, primary_key):
+        with sqlite3.connect("./db.sqlite3") as conn:
+            conn.row_factory = sqlite3.Row
+            db_cursor = conn.cursor()
+
+            db_cursor.execute(
+                """
+                DELETE FROM Comments
+                WHERE id = ? 
+                """,
+                (primary_key,),
+            )
+
+            number_of_row_deleted = db_cursor.rowcount
+            return True if number_of_row_deleted > 0 else False
